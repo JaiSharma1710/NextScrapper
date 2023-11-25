@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   description: 'A NextJs web scrapper made using peppetter',
 };
 
+export const maxDuration = 300;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function RootLayout({
   children,
 }: {
