@@ -1,12 +1,14 @@
 import Product from '@/lib/modals/product.modal';
 import { connectToDb } from '@/lib/mongoose';
+import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
 import { scrapeAmazonProduct } from '@/lib/scraper';
 import {
   getAveragePrice,
-  getEmailNotifType,
+  getEmailNotificationType,
   getHighestPrice,
   getLowestPrice,
 } from '@/lib/utils';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -51,12 +53,37 @@ export async function GET() {
         );
 
         //2 check each products status and send email accordingly
-        const emailNotificationType = getEmailNotifType(
+        const emailNotificationType = getEmailNotificationType(
           scrapedProduct,
           currentProduct,
         );
+
+        if (emailNotificationType && updatedProduct.users.length > 0) {
+          const productInfo = {
+            title: updatedProduct.title,
+            url: updatedProduct.url,
+          };
+          // Construct emailContent
+          const emailContent = await generateEmailBody(
+            productInfo,
+            emailNotificationType,
+          );
+          // Get array of user emails
+          const userEmails = updatedProduct.users.map(
+            (user: any) => user.email,
+          );
+          // Send email notification
+          await sendEmail(emailContent, userEmails);
+        }
+
+        return updatedProduct;
       }),
     );
+
+    return NextResponse.json({
+      message: 'Ok',
+      data: updateProductData,
+    });
   } catch (error) {
     throw new Error('failed to load product' + ':' + error);
   }
