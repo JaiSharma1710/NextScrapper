@@ -3,8 +3,8 @@ import * as cheerio from 'cheerio';
 
 import { extractCurrency, extractPrice } from '../utils';
 
-export async function scrapeAmazonProduct(productUrl: string) {
-  if (!productUrl) {
+export async function scrapeAmazonProduct(url: string) {
+  if (!url) {
     return;
   }
 
@@ -25,7 +25,7 @@ export async function scrapeAmazonProduct(productUrl: string) {
 
   try {
     // fetch the product page
-    const response = await axios.get(productUrl, options);
+    const response = await axios.get(url, options);
     const $ = cheerio.load(response.data);
 
     //Extract product data
@@ -59,7 +59,7 @@ export async function scrapeAmazonProduct(productUrl: string) {
 
     //construct data object with scrapped data
     const data = {
-      productUrl,
+      url,
       currency,
       image: imgUrl[0],
       title: productTitle,

@@ -8,17 +8,17 @@ import { getAveragePrice, getHighestPrice, getLowestPrice } from '../utils';
 import { User } from '@/types';
 import { generateEmailBody, sendEmail } from '../nodemailer';
 
-export async function scrapeAndStoreProduct(productUrl: string) {
-  if (!productUrl) return;
+export async function scrapeAndStoreProduct(url: string) {
+  if (!url) return;
   try {
     connectToDb();
-    const scrapedProduct = await scrapeAmazonProduct(productUrl);
+    const scrapedProduct = await scrapeAmazonProduct(url);
     if (!scrapedProduct) return false;
 
     let product = scrapedProduct;
 
     const existingProduct = await Product.findOne({
-      url: scrapedProduct.productUrl,
+      url: scrapedProduct.url,
     });
 
     if (existingProduct) {
@@ -39,7 +39,7 @@ export async function scrapeAndStoreProduct(productUrl: string) {
     }
 
     const newProduct = await Product.findOneAndUpdate(
-      { url: scrapedProduct.productUrl },
+      { url: scrapedProduct.url },
       product,
       {
         upsert: true,
@@ -90,28 +90,34 @@ export async function getSimilarProducts(ProductId: string) {
   }
 }
 
-export async function addUserEmailToProduct(productId: string, email: string) {
+export async function addUserEmailToProduct(
+  productId: string,
+  email: string,
+): Promise<{ message: string; isError: boolean }> {
   try {
     //send email
     connectToDb();
     const product = await Product.findById(productId);
-    if (!product) return;
+    if (!product) return { message: 'No product found', isError: true };
 
     const userExists: boolean = await product.users.some(
       (user: User) => user.email === email,
     );
 
     if (!userExists) {
-      // product.users.push({ email });
-      // await product.save();
+      product.users.push({ email });
+      await product.save();
 
       const emailContent = await generateEmailBody(product, 'WELCOME');
 
       await sendEmail(emailContent, [email]);
+
+      return { message: 'mail sent', isError: false };
     } else {
-      console.log('user present');
+      return { message: 'user already present', isError: false };
     }
   } catch (error) {
     console.log(error);
+    return { message: 'something went wrong', isError: true };
   }
 }

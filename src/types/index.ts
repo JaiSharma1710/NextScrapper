@@ -19,10 +19,10 @@ export type Product = {
   lowestPrice: number;
   averagePrice: number;
   discountRate: number;
-  description: string;
-  category: string;
-  reviewsCount: number;
-  stars: number;
+  description?: string;
+  category?: string;
+  reviewsCount?: number;
+  stars?: number;
   isOutOfStock: Boolean;
   users?: User[];
 };

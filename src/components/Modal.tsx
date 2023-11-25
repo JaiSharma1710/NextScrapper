@@ -3,8 +3,8 @@
 import { FormEvent, Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Image from 'next/image';
-// import toast from 'react-hot-toast';
 import { addUserEmailToProduct } from '@/lib/actions';
+import toast from 'react-hot-toast';
 
 interface Props {
   productId: string;
@@ -19,11 +19,15 @@ const Modal = ({ productId }: Props) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await addUserEmailToProduct(productId, email);
+    const { message, isError } = await addUserEmailToProduct(productId, email);
 
     setIsSubmitting(false);
     setEmail('');
     closeModal();
+    if (isError) {
+      toast.error(message);
+    }
+    toast.success(message);
   };
 
   const openModal = () => setIsOpen(true);
