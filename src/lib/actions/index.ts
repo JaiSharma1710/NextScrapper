@@ -105,8 +105,8 @@ export async function addUserEmailToProduct(
     );
 
     if (!userExists) {
-      product.users.push({ email });
-      await product.save();
+      // product.users.push({ email });
+      // await product.save();
 
       const emailContent = await generateEmailBody(product, 'WELCOME');
 

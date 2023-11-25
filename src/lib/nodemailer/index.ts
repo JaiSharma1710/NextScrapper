@@ -82,8 +82,10 @@ export const generateEmailBody = async (
 
 const transporter = nodemailer.createTransport({
   pool: true,
-  service: 'hotmail',
-  port: 2525,
+  service: 'outlook', // Use 'outlook' instead of 'hotmail'
+  host: 'smtp.office365.com', // Use 'smtp.office365.com' for Office 365
+  port: 587, // You may use port 587 or 465 (SSL)
+  secure: false, // Set to true if using port 465 (SSL)
   auth: {
     user: 'sharmajai901@gmail.com',
     pass: process.env.EMAIL_PASSWORD,
@@ -102,7 +104,8 @@ export async function sendEmail(emailContent: EmailContent, sendTo: string[]) {
   transporter.sendMail(mailOptions, (err: any, info: any) => {
     if (err) {
       console.log('mail send fail');
-      return console.log(err);
+      console.log(err);
+      return;
     }
     console.log('mail send');
     console.log(info);
