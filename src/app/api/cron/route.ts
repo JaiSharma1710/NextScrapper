@@ -22,7 +22,7 @@ export async function GET() {
 
     //1. scrape latest product details and update the db
 
-    const updateProductData = Promise.all(
+    const updateProductData = await Promise.all(
       products.map(async (currentProduct) => {
         const scrapedProduct = await scrapeAmazonProduct(currentProduct.url);
 
