@@ -11,7 +11,7 @@ export async function scrapeAndStoreProduct(productUrl: string) {
   try {
     connectToDb();
     const scrapedProduct = await scrapeAmazonProduct(productUrl);
-    if (!scrapedProduct) return;
+    if (!scrapedProduct) return false;
 
     let product = scrapedProduct;
 
@@ -46,7 +46,44 @@ export async function scrapeAndStoreProduct(productUrl: string) {
     );
 
     revalidatePath(`/products/${newProduct._id}`);
+    return true;
   } catch (error: any) {
     throw new Error(`failed to create product ${error.message}`);
+  }
+}
+
+export async function getProductById(ProductId: string) {
+  try {
+    connectToDb();
+    const product = await Product.findOne({ _id: ProductId });
+
+    if (!product) return null;
+    return product;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getAllProducts() {
+  try {
+    connectToDb();
+    const products = await Product.find({});
+    return products;
+  } catch (error) {
+    console.log(error);
+  }
+}
+export async function getSimilarProducts(ProductId: string) {
+  try {
+    connectToDb();
+    const currentProduct = Product.findById(ProductId);
+
+    if (!currentProduct) return null;
+
+    const similarProducts = Product.find({ _id: { $ne: ProductId } }).limit(3);
+
+    return similarProducts;
+  } catch (error) {
+    console.log(error);
   }
 }

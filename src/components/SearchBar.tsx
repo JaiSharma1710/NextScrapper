@@ -30,7 +30,13 @@ const SearchBar = () => {
 
     try {
       setIsLoading(true);
-      const product = await scrapeAndStoreProduct(searchPrompt);
+      const isScrapSuccessful = await scrapeAndStoreProduct(searchPrompt);
+      if (isScrapSuccessful) {
+        toast.success('scrap successful');
+        setSearchPrompt('');
+      } else {
+        toast.error('scrap successful');
+      }
     } catch (error) {
       console.log(error);
     } finally {
