@@ -5,12 +5,12 @@ let isConnectedToDb = false;
 export const connectToDb = () => {
   mongoose.set('strictQuery', true);
 
-  if (!process.env.MONG_URI) return console.log('no mongo uri');
+  if (!process.env.MONGODB_URI) return console.log('no mongo uri');
 
   if (isConnectedToDb) return console.log('already connected to db');
 
   try {
-    mongoose.connect(process.env.MONG_URI!);
+    mongoose.connect(process.env.MONGODB_URI!);
     isConnectedToDb = true;
     console.log('successfully connected to mongo');
   } catch (error) {
